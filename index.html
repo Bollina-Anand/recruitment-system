@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Recruitment System</title>
+<style>
+body { font-family: Arial; background:#f4f6f8; padding:20px; }
+h2 { text-align:center; }
+input, textarea { padding:6px; margin:5px; width:200px; }
+button { padding:6px 12px; cursor:pointer; margin:3px; }
+table { width:100%; border-collapse:collapse; margin-top:10px; background:#fff; }
+th, td { border:1px solid #ccc; padding:6px; font-size:12px; }
+th { background:#2c3e50; color:white; }
+#loginPage { text-align:center; margin-top:100px; }
+#adminPanel, #viewPage { display:none; }
+.sidebar { width:200px; float:left; background:#2c3e50; color:white; height:100vh; padding:20px; }
+.sidebar button{ width:100%; margin:10px 0; }
+.content{ margin-left:220px; }
+.topRightLogout{ position:absolute; right:30px; top:20px; }
+.smallTable{ width:95%; }
+</style>
+</head>
+<body>
+
+<div id="loginPage">
+<h2>Login</h2>
+<input id="userId" placeholder="User ID">
+<input id="userPass" type="password" placeholder="Password"><br>
+<button onclick="loginAsAdmin()">Login as Admin</button>
+<button onclick="loginAsRecruiter()">Login as Recruiter</button>
+</div>
+
+<div id="adminPanel">
+<div class="sidebar">
+<h3>Admin Panel</h3>
+<button onclick="showCandidates()">Add Candidates</button>
+<button onclick="showRecruiters()">Add Recruiters</button>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div class="content">
+
+<div id="recruiterSection" style="display:none;">
+<h2>Add Recruiter</h2>
+<input type="hidden" id="recEditId">
+<input id="recName" placeholder="Name">
+<input id="recEmail" placeholder="Email">
+<input id="recUser" placeholder="Username">
+<input id="recPass" placeholder="Password"><br>
+<button onclick="saveRecruiter()">Save Recruiter</button>
+
+<table class="smallTable">
+<thead>
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Username</th>
+<th>Password</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="recruiterTable"></tbody>
+</table>
+</div>
+
+<div id="candidateSection" style="display:none; position:relative;">
+<button id="recruiterLogoutBtn" class="topRightLogout" onclick="logout()" style="display:none;">Logout</button>
+
+<h2>Add Candidate</h2>
+
+<input type="hidden" id="editId">
+
+<input id="jobId" placeholder="Job ID">
+<input id="jobTitle" placeholder="Job Title *">
+<input id="firstName" placeholder="First Name *">
+<input id="lastName" placeholder="Last Name *">
+<input id="mobile" placeholder="Mobile No *">
+<input id="email" placeholder="Email *">
+<input id="city" placeholder="City *">
+<input id="state" placeholder="State *">
+<input id="zipCode" placeholder="Zip Code *">
+
+<input id="employmentType" placeholder="Employment Type (W2/C2C/1099)">
+<input id="client" placeholder="Client *">
+<input id="industry" placeholder="Industry (Domain)">
+<input id="visa" placeholder="Visa *">
+
+<input id="payRate" placeholder="PayRate">
+<input id="billRate" placeholder="BillRate">
+<input id="totalExp" placeholder="Total Experience">
+
+<input id="primarySkills" placeholder="Primary Skills">
+<input id="secondarySkills" placeholder="Secondary Skills">
+
+<input id="recruiter" placeholder="Recruiter *">
+
+<input id="submittedDate" type="date">
+<input id="submissionStatus" placeholder="Submission Status">
+<input id="interviewDate" type="date">
+<input id="interviewFeedback" placeholder="Interview Feedback">
+
+<input type="file" id="resume">
+
+<br>
+
+<button onclick="saveCandidate()">Save</button>
+<button onclick="downloadExcel()">Download Excel</button>
+
+<br>
+<input id="searchInput" onkeyup="searchCandidate()" placeholder="Search by Name, Email, Job Title, Job ID, Mobile">
+<button onclick="searchCandidate()">Search</button>
+<button onclick="clearSearch()">Clear</button>
+
+<table class="smallTable">
+<thead>
+<tr>
+<th>Job Title *</th>
+<th>First *</th>
+<th>Last *</th>
+<th>Mobile *</th>
+<th>Email *</th>
+<th>City *</th>
+<th>State *</th>
+<th>Client *</th>
+<th>Visa *</th>
+<th>Recruiter *</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="candidateTable"></tbody>
+</table>
+
+<br>
+<button onclick="openView()">View Candidates</button>
+
+</div>
+</div>
+</div>
+
+<div id="viewPage">
+<button onclick="backToPanel()">Back</button>
+<button class="topRightLogout" onclick="logout()">Logout</button>
+
+<h2>All Candidate Details</h2>
+
+<table>
+<thead>
+<tr>
+<th>Job ID</th>
+<th>Job Title</th>
+<th>First</th>
+<th>Last</th>
+<th>Mobile</th>
+<th>Email</th>
+<th>City</th>
+<th>State</th>
+<th>Zip</th>
+<th>Employment Type</th>
+<th>Client</th>
+<th>Industry</th>
+<th>Visa</th>
+<th>PayRate</th>
+<th>BillRate</th>
+<th>Total Exp</th>
+<th>Primary Skills</th>
+<th>Secondary Skills</th>
+<th>Recruiter</th>
+<th>Submitted Date</th>
+<th>Status</th>
+<th>Interview Date</th>
+<th>Interview Feedback</th>
+<th>Resume</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="viewTable"></tbody>
+</table>
+</div>
+
+<script>
+
+const API_URL="https://script.google.com/macros/s/AKfycbxiID88XQQJRmV9z5zxqenXkJM81sgF0r0WqKPaprKgEpcdrOS3psbLsuKTazgS5fL7/exec";
+
+let candidates=[];
+let recruiters=[];
+
+window.onload=function(){
+loadCandidates();
+loadRecruiters();
+}
+
+// ===== FETCH =====
+function loadCandidates(){
+fetch(API_URL)
+.then(res=>res.json())
+.then(data=>{
+candidates=data.slice(1).map(r=>({
+id:r[0],
+jobId:r[1],
+jobTitle:r[2],
+firstName:r[3],
+lastName:r[4],
+mobile:r[5],
+email:r[6],
+city:r[7],
+state:r[8],
+zipCode:r[9],
+employmentType:r[10],
+client:r[11],
+industry:r[12],
+visa:r[13],
+payRate:r[14],
+billRate:r[15],
+totalExp:r[16],
+primarySkills:r[17],
+secondarySkills:r[18],
+recruiter:r[19],
+submittedDate:r[20],
+submissionStatus:r[21],
+interviewDate:r[22],
+interviewFeedback:r[23],
+resume:r[24]
+}));
+displayCandidates();
+});
+}
+
+function loadRecruiters(){
+fetch(API_URL+"?type=recruiters")
+.then(res=>res.json())
+.then(data=>{
+recruiters=data.slice(1).map(r=>({
+id:r[0],
+name:r[1],
+email:r[2],
+username:r[3],
+password:r[4]
+}));
+displayRecruiters();
+});
+}
+
+// ===== SAVE / UPDATE =====
+function saveCandidate(){
+
+let action = editId.value ? "updateCandidate" : "addCandidate";
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+action:action,
+id:editId.value,
+jobId:jobId.value,
+jobTitle:jobTitle.value,
+firstName:firstName.value,
+lastName:lastName.value,
+mobile:mobile.value,
+email:email.value,
+city:city.value,
+state:state.value,
+zipCode:zipCode.value,
+employmentType:employmentType.value,
+client:client.value,
+industry:industry.value,
+visa:visa.value,
+payRate:payRate.value,
+billRate:billRate.value,
+totalExp:totalExp.value,
+primarySkills:primarySkills.value,
+secondarySkills:secondarySkills.value,
+recruiter:recruiter.value,
+submittedDate:submittedDate.value,
+submissionStatus:submissionStatus.value,
+interviewDate:interviewDate.value,
+interviewFeedback:interviewFeedback.value,
+resume:""
+})
+})
+.then(()=>{
+editId.value="";
+loadCandidates();
+});
+
+clearFields();
+}
+
+function deleteCandidate(id){
+
+if(!confirm("Are you sure want to delete?")) return;
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"deleteCandidate",
+id:String(id)
+})
+})
+.then(res=>res.text())
+.then(res=>{
+
+console.log(res);
+
+// remove from UI immediately (fast UX)
+candidates = candidates.filter(c => String(c.id) !== String(id));
+displayCandidates();
+
+alert("Deleted Successfully");
+
+// optional reload from server
+setTimeout(loadCandidates,500);
+
+});
+
+}
+
+// ===== RECRUITER =====
+function saveRecruiter(){
+
+let action = recEditId.value ? "updateRecruiter" : "addRecruiter";
+
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+action:action,
+id:String(recEditId.value),
+name:recName.value,
+email:recEmail.value,
+username:recUser.value,
+password:recPass.value
+})
+}).then(()=>{
+recEditId.value="";
+loadRecruiters();
+});
+
+recName.value="";
+recEmail.value="";
+recUser.value="";
+recPass.value="";
+}
+
+function deleteRecruiter(id){
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"deleteRecruiter",
+id:id
+})
+}).then(()=>loadRecruiters());
+}
+
+// ===== DISPLAY =====
+function displayCandidates(){
+candidateTable.innerHTML="";
+candidates.forEach(c=>{
+candidateTable.innerHTML+=`
+<tr>
+<td>${c.jobTitle}</td>
+<td>${c.firstName}</td>
+<td>${c.lastName}</td>
+<td>${c.mobile}</td>
+<td>${c.email}</td>
+<td>${c.city}</td>
+<td>${c.state}</td>
+<td>${c.client}</td>
+<td>${c.visa}</td>
+<td>${c.recruiter}</td>
+<td>
+<button onclick="editCandidate('${c.id}')">Update</button>
+<button onclick="deleteCandidate('${c.id}')">Delete</button>
+</td>
+</tr>`;
+});
+}
+
+function displayRecruiters(){
+recruiterTable.innerHTML="";
+recruiters.forEach(r=>{
+recruiterTable.innerHTML+=`
+<tr>
+<td>${r.name}</td>
+<td>${r.email}</td>
+<td>${r.username}</td>
+<td>${r.password}</td>
+<td>
+<button onclick="editRecruiter('${r.id}')">Update</button>
+<button onclick="deleteRecruiter('${r.id}')">Delete</button>
+</td>
+</tr>`;
+});
+}
+
+// ===== EDIT =====
+function editCandidate(id){
+let c=candidates.find(x=>x.id==id);
+Object.keys(c).forEach(k=>{
+if(document.getElementById(k)) document.getElementById(k).value=c[k];
+});
+editId.value=id;
+}
+
+function editRecruiter(id){
+let r=recruiters.find(x=>x.id==id);
+recEditId.value=id;
+recName.value=r.name;
+recEmail.value=r.email;
+recUser.value=r.username;
+recPass.value=r.password;
+}
+
+// ===== SEARCH =====
+
+function searchCandidate(){
+
+let text = searchInput.value.toLowerCase().trim();
+
+// 👉 empty unte full list chupinchu
+if(text === ""){
+displayCandidates();
+return;
+}
+
+// 🔥 safety check
+if(candidates.length === 0){
+alert("Data not loaded yet");
+return;
+}
+
+// 🔥 filter
+let filtered = candidates.filter(c =>
+String(c.firstName || "").toLowerCase().includes(text) ||
+String(c.lastName || "").toLowerCase().includes(text) ||
+String(c.email || "").toLowerCase().includes(text) ||
+String(c.jobTitle || "").toLowerCase().includes(text) ||
+String(c.jobId || "").toLowerCase().includes(text) ||
+String(c.mobile || "").toLowerCase().includes(text)
+);
+
+// 🔥 display
+candidateTable.innerHTML = "";
+
+filtered.forEach(c=>{
+candidateTable.innerHTML += `
+<tr>
+<td>${c.jobTitle}</td>
+<td>${c.firstName}</td>
+<td>${c.lastName}</td>
+<td>${c.mobile}</td>
+<td>${c.email}</td>
+<td>${c.city}</td>
+<td>${c.state}</td>
+<td>${c.client}</td>
+<td>${c.visa}</td>
+<td>${c.recruiter}</td>
+<td>
+<button onclick="editCandidate(${c.id})">Update</button>
+<button onclick="deleteCandidate(${c.id})">Delete</button>
+</td>
+</tr>`;
+});
+
+// 🔥 no data case
+if(filtered.length === 0){
+candidateTable.innerHTML = "<tr><td colspan='10'>No Data Found</td></tr>";
+}
+
+}
+
+function clearSearch(){
+searchInput.value="";
+loadCandidates();   // important change
+}
+
+// ===== VIEW PAGE =====
+function openView(){
+
+adminPanel.style.display="none";
+viewPage.style.display="block";
+
+viewTable.innerHTML="";
+
+candidates.forEach(c=>{
+
+viewTable.innerHTML += `
+<tr>
+<td>${c.jobId||""}</td>
+<td>${c.jobTitle||""}</td>
+<td>${c.firstName||""}</td>
+<td>${c.lastName||""}</td>
+<td>${c.mobile||""}</td>
+<td>${c.email||""}</td>
+<td>${c.city||""}</td>
+<td>${c.state||""}</td>
+<td>${c.zipCode||""}</td>
+<td>${c.employmentType||""}</td>
+<td>${c.client||""}</td>
+<td>${c.industry||""}</td>
+<td>${c.visa||""}</td>
+<td>${c.payRate||""}</td>
+<td>${c.billRate||""}</td>
+<td>${c.totalExp||""}</td>
+<td>${c.primarySkills||""}</td>
+<td>${c.secondarySkills||""}</td>
+<td>${c.recruiter||""}</td>
+<td>${c.submittedDate||""}</td>
+<td>${c.submissionStatus||""}</td>
+<td>${c.interviewDate||""}</td>
+<td>${c.interviewFeedback||""}</td>
+<td>${c.resume ? `<a href="${c.resume}" download>Download</a>` : "-"}</td>
+<td>
+<button onclick="deleteCandidate('${c.id}'); setTimeout(openView,500)">Delete</button>
+</td>
+</tr>`;
+});
+
+}
+function backToPanel(){
+viewPage.style.display="none";
+adminPanel.style.display="block";
+}
+
+// ===== EXCEL =====
+function downloadExcel(){
+let csv="Job ID,Job Title,First,Last,Mobile,Email,City,State,Client,Visa,Recruiter\n";
+
+candidates.forEach(c=>{
+csv+=`${c.jobId},${c.jobTitle},${c.firstName},${c.lastName},${c.mobile},${c.email},${c.city},${c.state},${c.client},${c.visa},${c.recruiter}\n`;
+});
+
+let blob=new Blob([csv],{type:"text/csv"});
+let link=document.createElement("a");
+link.href=URL.createObjectURL(blob);
+link.download="Candidates.xls";
+link.click();
+}
+
+// ===== LOGIN =====
+function loginAsAdmin(){
+if(userId.value==="admin" && userPass.value==="1234"){
+loginPage.style.display="none";
+adminPanel.style.display="block";
+showCandidates();
+}else alert("Invalid Admin");
+}
+
+function loginAsRecruiter(){
+fetch(API_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"login",
+username:userId.value,
+password:userPass.value
+})
+})
+.then(res=>res.text())
+.then(res=>{
+if(res==="success"){
+loginPage.style.display="none";
+adminPanel.style.display="block";
+document.querySelector(".sidebar").style.display="none";
+document.querySelector(".content").style.marginLeft="0px";
+document.getElementById("recruiterLogoutBtn").style.display="block";
+showCandidates();
+}else alert("Invalid Recruiter");
+});
+}
+
+// ===== UI =====
+function showCandidates(){
+candidateSection.style.display="block";
+recruiterSection.style.display="none";
+}
+
+function showRecruiters(){
+candidateSection.style.display="none";
+recruiterSection.style.display="block";
+}
+
+function clearFields(){
+document.querySelectorAll("#candidateSection input").forEach(i=>{
+if(i.type!="file") i.value="";
+});
+}
+
+function logout(){
+location.reload();
+}
+
+</script>
