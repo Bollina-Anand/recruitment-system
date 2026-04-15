@@ -519,17 +519,46 @@ adminPanel.style.display="block";
 }
 
 // ===== EXCEL =====
+
 function downloadExcel(){
-let csv="Job ID,Job Title,First,Last,Mobile,Email,City,State,Client,Visa,Recruiter\n";
+
+let csv = "Job ID,Job Title,First Name,Last Name,Mobile,Email,City,State,ZipCode,Employment Type,Client,Industry,Visa,PayRate,BillRate,Total Exp,Primary Skills,Secondary Skills,Recruiter,Submitted Date,Status,Interview Date,Interview Feedback\n";
 
 candidates.forEach(c=>{
-csv+=`${c.jobId},${c.jobTitle},${c.firstName},${c.lastName},${c.mobile},${c.email},${c.city},${c.state},${c.client},${c.visa},${c.recruiter}\n`;
+
+csv += [
+c.jobId||"",
+c.jobTitle||"",
+c.firstName||"",
+c.lastName||"",
+c.mobile||"",
+c.email||"",
+c.city||"",
+c.state||"",
+c.zipCode||"",
+c.employmentType||"",
+c.client||"",
+c.industry||"",
+c.visa||"",
+c.payRate||"",
+c.billRate||"",
+c.totalExp||"",
+c.primarySkills||"",
+c.secondarySkills||"",
+c.recruiter||"",
+c.submittedDate||"",
+c.submissionStatus||"",
+c.interviewDate||"",
+c.interviewFeedback||""
+].map(v => `"${String(v).replace(/"/g,'""')}"`).join(",") + "\n";
+
 });
 
-let blob=new Blob([csv],{type:"text/csv"});
-let link=document.createElement("a");
-link.href=URL.createObjectURL(blob);
-link.download="Candidates.xls";
+let blob = new Blob([csv], { type:"text/csv;charset=utf-8;" });
+
+let link = document.createElement("a");
+link.href = URL.createObjectURL(blob);
+link.download = "Candidates.csv";
 link.click();
 }
 
