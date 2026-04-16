@@ -183,10 +183,40 @@ const API_URL="https://script.google.com/macros/s/AKfycbxiID88XQQJRmV9z5zxqenXkJ
 let candidates=[];
 let recruiters=[];
 
-window.onload=function(){
+window.onload = function(){
+
 loadCandidates();
 loadRecruiters();
+
+let role = localStorage.getItem("role");
+
+if(role === "admin"){
+
+document.getElementById("loginPage").style.display="none";
+document.getElementById("adminPanel").style.display="block";
+
+showCandidates();
+
 }
+else if(role === "recruiter"){
+
+document.getElementById("loginPage").style.display="none";
+document.getElementById("adminPanel").style.display="block";
+
+document.querySelector(".sidebar").style.display="none";
+document.querySelector(".content").style.marginLeft="0px";
+document.getElementById("recruiterLogoutBtn").style.display="block";
+
+showCandidates();
+}
+else{
+
+document.getElementById("loginPage").style.display="block";
+document.getElementById("adminPanel").style.display="none";
+
+}
+
+};
 
 // ===== FETCH =====
 function loadCandidates(){
@@ -565,6 +595,7 @@ link.click();
 // ===== LOGIN =====
 function loginAsAdmin(){
 if(userId.value==="admin" && userPass.value==="1234"){
+localStorage.setItem("role","admin"); // ✅ ADD THIS
 loginPage.style.display="none";
 adminPanel.style.display="block";
 showCandidates();
@@ -583,6 +614,7 @@ password:userPass.value
 .then(res=>res.text())
 .then(res=>{
 if(res==="success"){
+localStorage.setItem("role","recruiter"); // ✅ ADD THIS
 loginPage.style.display="none";
 adminPanel.style.display="block";
 document.querySelector(".sidebar").style.display="none";
@@ -611,6 +643,7 @@ if(i.type!="file") i.value="";
 }
 
 function logout(){
+localStorage.removeItem("role"); // ✅ IMPORTANT
 location.reload();
 }
 
