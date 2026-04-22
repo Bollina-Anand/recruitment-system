@@ -427,17 +427,15 @@ if(document.getElementById(k)) document.getElementById(k).value=c[k];
 });
 editId.value=id;
 }
-  
+
 function editFromView(id){
 
-// find candidate
 let c = candidates.find(x => x.id == id);
 
-// back to form page
+// switch UI
 viewPage.style.display = "none";
 adminPanel.style.display = "block";
 
-// open candidate section
 showCandidates();
 
 // fill form
@@ -447,11 +445,13 @@ document.getElementById(k).value = c[k];
 }
 });
 
-// set edit id
+// 🔥 VERY IMPORTANT
 editId.value = id;
 
-}
+// optional UI change
+document.querySelector("button[onclick='saveCandidate()']").innerText = "Update";
 
+}
 function editRecruiter(id){
 let r=recruiters.find(x=>x.id==id);
 recEditId.value=id;
