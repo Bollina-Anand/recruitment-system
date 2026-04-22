@@ -106,7 +106,7 @@ th { background:#2c3e50; color:white; }
 <button onclick="downloadExcel()">Download Excel</button>
 
 <br>
-<input id="searchInput" onkeyup="searchCandidate()" placeholder="Search by Name, Email, Job Title, Job ID, Mobile">
+<input id="searchInput" onkeyup="searchCandidate()" placeholder="Search by Name, Email, Job Title, Job ID, Mobile, Client, Recruiter">
 <button onclick="searchCandidate()">Search</button>
 <button onclick="clearSearch()">Clear</button>
 
@@ -462,7 +462,9 @@ String(c.lastName || "").toLowerCase().includes(text) ||
 String(c.email || "").toLowerCase().includes(text) ||
 String(c.jobTitle || "").toLowerCase().includes(text) ||
 String(c.jobId || "").toLowerCase().includes(text) ||
-String(c.mobile || "").toLowerCase().includes(text)
+String(c.mobile || "").toLowerCase().includes(text) || 
+String(c.client || "").toLowerCase().includes(text) || 
+String(c.recruiter || "").toLowerCase().includes(text)
 );
 
 // 🔥 display
