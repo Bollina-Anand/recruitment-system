@@ -427,6 +427,30 @@ if(document.getElementById(k)) document.getElementById(k).value=c[k];
 });
 editId.value=id;
 }
+  
+function editFromView(id){
+
+// find candidate
+let c = candidates.find(x => x.id == id);
+
+// back to form page
+viewPage.style.display = "none";
+adminPanel.style.display = "block";
+
+// open candidate section
+showCandidates();
+
+// fill form
+Object.keys(c).forEach(k=>{
+if(document.getElementById(k)){
+document.getElementById(k).value = c[k];
+}
+});
+
+// set edit id
+editId.value = id;
+
+}
 
 function editRecruiter(id){
 let r=recruiters.find(x=>x.id==id);
@@ -538,7 +562,8 @@ viewTable.innerHTML += `
 <td>${formatDate(c.interviewDate)}</td>
 <td>${c.interviewFeedback||""}</td>
 <td>${c.resume ? `<a href="${c.resume}" download>Download</a>` : "-"}</td>
-<td>
+<td style="white-space:nowrap;">
+<button onclick="editFromView('${c.id}')">Update</button>
 <button onclick="deleteCandidate('${c.id}'); setTimeout(openView,500)">Delete</button>
 </td>
 </tr>`;
