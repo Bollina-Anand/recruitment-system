@@ -77,7 +77,7 @@ th { background:#2c3e50; color:white; }
 <input id="email" placeholder="Email *">
 <input id="city" placeholder="City *">
 <input id="state" placeholder="State *">
-<input id="zipCode" placeholder="Zip Code *">
+<input id="zipCode" placeholder="Zip Code">
 
 <input id="employmentType" placeholder="Employment Type (W2/C2C/1099)">
 <input id="client" placeholder="Client *">
@@ -531,9 +531,9 @@ viewTable.innerHTML += `
 <td>${c.primarySkills||""}</td>
 <td>${c.secondarySkills||""}</td>
 <td>${c.recruiter||""}</td>
-<td>${c.submittedDate||""}</td>
+<td>${formatDate(c.submittedDate)}</td>
 <td>${c.submissionStatus||""}</td>
-<td>${c.interviewDate||""}</td>
+<td>${formatDate(c.interviewDate)}</td>
 <td>${c.interviewFeedback||""}</td>
 <td>${c.resume ? `<a href="${c.resume}" download>Download</a>` : "-"}</td>
 <td>
@@ -645,6 +645,18 @@ if(i.type!="file") i.value="";
 function logout(){
 localStorage.removeItem("role"); // ✅ IMPORTANT
 location.reload();
+}
+
+function formatDate(dateStr){
+if(!dateStr) return "";
+
+let d = new Date(dateStr);
+
+let day = String(d.getDate()).padStart(2,'0');
+let month = String(d.getMonth()+1).padStart(2,'0');
+let year = d.getFullYear();
+
+return `${day}-${month}-${year}`;
 }
 
 </script>
