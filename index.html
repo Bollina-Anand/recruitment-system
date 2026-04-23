@@ -229,12 +229,20 @@ th {
 <button onclick="saveCandidate()">Save</button>
 <button class="downloadBtn" onclick="downloadExcel()">Download Excel</button>
 
-<br>
-<input id="searchInput" onkeyup="searchCandidate()" placeholder="Search by Name, Email, Job Title, Job ID, Mobile, Client, Recruiter">
-<button onclick="searchCandidate()">Search</button>
-<button onclick="clearSearch()">Clear</button>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
 
-<span id="totalCount">Total: 0</span>
+  <!-- LEFT SIDE -->
+  <div>
+    <input id="searchInput" onkeyup="searchCandidate()" placeholder="Search by Name, Email, Job Title, Job ID, Mobile, Client, Recruiter">
+    <button onclick="searchCandidate()">Search</button>
+    <button onclick="clearSearch()">Clear</button>
+    <span id="totalCount" style="margin-left:10px; color:red; font-weight:bold;">Total: 0</span>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <button class="downloadBtn" onclick="openView()">View Candidates</button>
+
+</div>
 
 <table class="smallTable">
 <thead>
@@ -254,9 +262,6 @@ th {
 </thead>
 <tbody id="candidateTable"></tbody>
 </table>
-
-<br>
-<button onclick="openView()">View Candidates</button>
 
 </div>
 </div>
