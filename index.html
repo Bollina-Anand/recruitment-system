@@ -3,20 +3,144 @@
 <head>
 <title>Recruitment System</title>
 <style>
-body { font-family: Arial; background:#f4f6f8; padding:20px; }
-h2 { text-align:center; }
-input, textarea { padding:6px; margin:5px; width:200px; }
-button { padding:6px 12px; cursor:pointer; margin:3px; }
-table { width:100%; border-collapse:collapse; margin-top:10px; background:#fff; }
-th, td { border:1px solid #ccc; padding:6px; font-size:12px; }
-th { background:#2c3e50; color:white; }
-#loginPage { text-align:center; margin-top:100px; }
-#adminPanel, #viewPage { display:none; }
-.sidebar { width:200px; float:left; background:#2c3e50; color:white; height:100vh; padding:20px; }
-.sidebar button{ width:100%; margin:10px 0; }
-.content{ margin-left:220px; }
-.topRightLogout{ position:absolute; right:30px; top:20px; }
-.smallTable{ width:95%; }
+body {
+  font-family: Arial;
+  background:#f1f5f9;
+  padding:20px;
+}
+
+/* headings */
+h2 {
+  text-align:center;
+  color:#0f172a;
+}
+
+/* inputs */
+input, textarea {
+  padding:8px;
+  margin:5px;
+  width:200px;
+  border:1px solid #cbd5e1;
+  border-radius:6px;
+  outline:none;
+}
+
+input:focus {
+  border-color:#2563eb;
+}
+
+/* buttons (default blue) */
+button {
+  padding:6px 12px;
+  cursor:pointer;
+  margin:3px;
+  background:#2563eb;
+  color:white;
+  border:none;
+  border-radius:5px;
+}
+
+button:hover {
+  background:#1d4ed8;
+}
+
+/* ✅ LOGIN BUTTONS GREEN */
+.loginBtn {
+  background:#16a34a;
+}
+
+.loginBtn:hover {
+  background:#15803d;
+}
+
+/* ✅ DOWNLOAD BUTTON GREEN */
+.downloadBtn {
+  background:#16a34a;
+}
+
+.downloadBtn:hover {
+  background:#15803d;
+}
+
+/* table */
+table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+  background:#ffffff;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+th, td {
+  border:1px solid #e2e8f0;
+  padding:8px;
+  font-size:12px;
+  text-align:left;
+}
+
+th {
+  background:#334155;
+  color:white;
+}
+
+/* login */
+#loginPage {
+  text-align:center;
+  margin-top:100px;
+}
+
+/* layout */
+#adminPanel, #viewPage {
+  display:none;
+}
+
+/* sidebar */
+.sidebar {
+  width:200px;
+  float:left;
+  background:#0f172a;
+  color:white;
+  height:100vh;
+  padding:20px;
+}
+
+.sidebar h3 {
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.sidebar button {
+  width:100%;
+  margin:10px 0;
+  background:#1e293b;
+}
+
+.sidebar button:hover {
+  background:#334155;
+}
+
+/* content */
+.content {
+  margin-left:220px;
+}
+
+/* logout */
+.topRightLogout {
+  position:absolute;
+  right:30px;
+  top:20px;
+}
+
+/* small table */
+.smallTable {
+  width:95%;
+}
+
+/* ✅ TOTAL COUNT RED */
+#totalCount {
+  color:red;
+  font-weight:bold;
+}
 </style>
 </head>
 <body>
@@ -25,8 +149,8 @@ th { background:#2c3e50; color:white; }
 <h2>Login</h2>
 <input id="userId" placeholder="User ID">
 <input id="userPass" type="password" placeholder="Password"><br>
-<button onclick="loginAsAdmin()">Login as Admin</button>
-<button onclick="loginAsRecruiter()">Login as Recruiter</button>
+<button class="loginBtn" onclick="loginAsAdmin()">Login as Admin</button>
+<button class="loginBtn" onclick="loginAsRecruiter()">Login as Recruiter</button>
 </div>
 
 <div id="adminPanel">
@@ -103,16 +227,14 @@ th { background:#2c3e50; color:white; }
 <br>
 
 <button onclick="saveCandidate()">Save</button>
-<button onclick="downloadExcel()">Download Excel</button>
+<button class="downloadBtn" onclick="downloadExcel()">Download Excel</button>
 
 <br>
 <input id="searchInput" onkeyup="searchCandidate()" placeholder="Search by Name, Email, Job Title, Job ID, Mobile, Client, Recruiter">
 <button onclick="searchCandidate()">Search</button>
 <button onclick="clearSearch()">Clear</button>
 
-<span id="totalCount" style="margin-left:15px; font-weight:bold; color:#2c3e50;">
-Total: 0
-</span>
+<span id="totalCount">Total: 0</span>
 
 <table class="smallTable">
 <thead>
