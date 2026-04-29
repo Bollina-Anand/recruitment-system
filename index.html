@@ -268,8 +268,21 @@ th {
 </div>
 
 <div id="viewPage">
-<button onclick="backToPanel()">Back</button>
+
+<div style="display:flex; justify-content:space-between; align-items:center;">
+
+  <div>
+    <button onclick="backToPanel()">Back</button>
+
+    <!-- ✅ NEW SEARCH -->
+    <input id="viewSearchInput" onkeyup="searchViewCandidate()" placeholder="Search candidates...">
+    <button onclick="searchViewCandidate()">Search</button>
+    <button onclick="clearViewSearch()">Clear</button>
+  </div>
+
 <button class="topRightLogout" onclick="logout()">Logout</button>
+
+</div>
 
 <h2>All Candidate Details</h2>
 
@@ -707,6 +720,68 @@ viewTable.innerHTML += `
 function backToPanel(){
 viewPage.style.display="none";
 adminPanel.style.display="block";
+}
+
+function searchViewCandidate(){
+
+let text = document.getElementById("viewSearchInput").value.toLowerCase().trim();
+
+if(text === ""){
+openView(); // reload full table
+return;
+}
+
+let filtered = candidates.filter(c =>
+String(c.firstName || "").toLowerCase().includes(text) ||
+String(c.lastName || "").toLowerCase().includes(text) ||
+String(c.email || "").toLowerCase().includes(text) ||
+String(c.jobTitle || "").toLowerCase().includes(text) ||
+String(c.jobId || "").toLowerCase().includes(text) ||
+String(c.mobile || "").toLowerCase().includes(text) ||
+String(c.client || "").toLowerCase().includes(text) ||
+String(c.recruiter || "").toLowerCase().includes(text)
+);
+
+viewTable.innerHTML = "";
+
+filtered.forEach(c=>{
+
+viewTable.innerHTML += `
+<tr>
+<td>${c.jobId||""}</td>
+<td>${c.jobTitle||""}</td>
+<td>${c.firstName||""}</td>
+<td>${c.lastName||""}</td>
+<td>${c.mobile||""}</td>
+<td>${c.email||""}</td>
+<td>${c.city||""}</td>
+<td>${c.state||""}</td>
+<td>${c.zipCode||""}</td>
+<td>${c.employmentType||""}</td>
+<td>${c.client||""}</td>
+<td>${c.industry||""}</td>
+<td>${c.visa||""}</td>
+<td>${c.payRate||""}</td>
+<td>${c.billRate||""}</td>
+<td>${c.totalExp||""}</td>
+<td>${c.primarySkills||""}</td>
+<td>${c.secondarySkills||""}</td>
+<td>${c.recruiter||""}</td>
+<td>${formatDate(c.submittedDate)}</td>
+<td>${c.submissionStatus||""}</td>
+<td>${formatDate(c.interviewDate)}</td>
+<td>${c.interviewFeedback||""}</td>
+<td>${c.resume ? `<a href="${c.resume}" download>Download</a>` : "-"}</td>
+<td>
+<button onclick="editFromView('${c.id}')">Update</button>
+<button onclick="deleteCandidate('${c.id}'); setTimeout(openView,500)">Delete</button>
+</td>
+</tr>`;
+});
+
+if(filtered.length === 0){
+viewTable.innerHTML = "<tr><td colspan='25'>No Data Found</td></tr>";
+}
 }
 
 // ===== EXCEL =====
